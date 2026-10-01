@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Sistema de registro de mascotas">
+  <title>Sistema de registro de mascotas</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">LD</div>
+        <div>
+          <p class="eyebrow">Lucky Dogs Club House</p>
+          <h1>Sistema de registro de mascotas</h1>
+        </div>
+      </div>
+      <div class="status"><span class="status-dot"></span> Datos guardados localmente</div>
+    </header>
+
+    <main>
+      <section class="intro">
+        <div>
+          <p class="eyebrow accent">Control de ingreso</p>
+          <h2>Una ficha clara para cada nueva historia.</h2>
+          <p class="intro-copy">Registra las mascotas que actualmente se encuentran en el refugio y consulta su información en un solo lugar.</p>
+        </div>
+        <div class="summary" aria-label="Resumen del registro">
+          <span class="summary-label">Mascotas registradas</span>
+          <strong id="total-count">0</strong>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <form id="dog-form" class="panel form-panel" autocomplete="off">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Nueva ficha</p>
+              <h3>Registrar ingreso</h3>
+            </div>
+            <span class="required-note">* Campo obligatorio</span>
+          </div>
+
+          <div class="form-fields">
+            <label class="field field-full">
+              <span>Fecha de ingreso <b>*</b></span>
+              <input id="entry-date" name="entryDate" type="date" required>
+            </label>
+            <label class="field">
+              <span>Nombre de la mascota <b>*</b></span>
+              <input id="dog-name" name="dogName" type="text" maxlength="60" placeholder="Ej. Bruno" required>
+            </label>
+            <label class="field pet-type-field">
+              <span>Tipo de mascota <b>*</b></span>
+              <select id="pet-type" name="petType" required>
+                <option value="">Selecciona una opción</option>
+                <option value="Perro">Perro</option>
+                <option value="Gato">Gato</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Raza <b>*</b></span>
+              <input id="breed" name="breed" type="text" maxlength="60" placeholder="Ej. Mestizo" required>
+            </label>
+            <label class="field">
+              <span>Sexo <b>*</b></span>
+              <select id="sex" name="sex" required>
+                <option value="">Selecciona una opción</option>
+                <option value="Hembra">Hembra</option>
+                <option value="Macho">Macho</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Edad <b>*</b></span>
+              <div class="age-input age-fields">
+                <label>
+                  <input id="age-years" name="ageYears" type="number" min="0" max="40" step="1" placeholder="0" required>
+                  <span>años</span>
+                </label>
+                <label>
+                  <input id="age-months" name="ageMonths" type="number" min="0" max="11" step="1" placeholder="0" required>
+                  <span>meses</span>
+                </label>
+              </div>
+            </label>
+            <label class="field field-full">
+              <span>Comentarios</span>
+              <textarea id="comments" name="comments" maxlength="500" rows="3" placeholder="Anota cuidados, comportamiento u otra información relevante..."></textarea>
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button class="button button-primary" type="submit">Agregar al registro</button>
+            <button class="button button-secondary" id="clear-form" type="button">Limpiar</button>
+          </div>
+          <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
+        </form>
+
+        <aside class="panel info-panel">
+          <div class="info-icon" aria-hidden="true">i</div>
+          <div>
+            <h3>Registro local</h3>
+            <p>La información se conserva en este navegador mediante almacenamiento local. No se envía a internet.</p>
+          </div>
+          <div class="info-rule"></div>
+          <div class="quick-stat">
+            <span>Último ingreso</span>
+            <strong id="last-entry">Sin registros</strong>
+          </div>
+        </aside>
+      </section>
+
+      <section class="panel table-panel">
+        <div class="table-heading">
+          <div>
+            <p class="eyebrow">Listado actual</p>
+            <h3>Mascotas en el refugio</h3>
+          </div>
+          <div class="table-tools">
+            <label class="search-box">
+              <span class="sr-only">Buscar mascota</span>
+              <input id="search-input" type="search" placeholder="Buscar por nombre o raza...">
+            </label>
+            <button class="button button-outline" id="export-csv" type="button">Exportar CSV</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>Fecha de ingreso</th>
+                <th>Nombre</th>
+                <th>Tipo</th>
+                <th>Raza</th>
+                <th>Sexo</th>
+                <th>Edad</th>
+                <th>Comentarios</th>
+                <th><span class="sr-only">Acciones</span></th>
+              </tr>
+            </thead>
+            <tbody id="dogs-table-body"></tbody>
+          </table>
+          <div class="empty-state" id="empty-state">
+            <div class="empty-mark" aria-hidden="true">+</div>
+            <h4>Aún no hay mascotas registradas</h4>
+            <p>Completa la ficha de ingreso para comenzar el listado.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel actions-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Gestión</p>
+            <h3>Funciones extras</h3>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="button button-primary" type="button" id="open-clinic-button">Abrir historia clínica</button>
+        </div>
+      </section>
+    </main>
+
+    <footer>Refugio Lucky Dogs Club House <span>·</span> Registro administrativo local</footer>
+  </div>
+
+  <div class="modal hidden" id="clinic-modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close-clinic="true"></div>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="clinic-title">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow accent">Ficha médica</p>
+          <h3 id="clinic-title">Historia clínica</h3>
+        </div>
+        <button class="icon-button" type="button" id="close-clinic-modal" aria-label="Cerrar historia clínica">×</button>
+      </div>
+
+      <div class="clinic-pet-head">
+        <div>
+          <p class="clinic-pet-name" id="clinic-pet-name">Mascota</p>
+          <span class="clinic-pet-meta" id="clinic-pet-meta">Cargando datos...</span>
+        </div>
+      </div>
+
+      <div class="clinic-form">
+        <label class="field field-full">
+          <span>Historia clínica</span>
+          <textarea id="clinic-history" rows="5" placeholder="Describe antecedentes, observaciones clínicas, tratamiento, comportamiento y otros datos relevantes..."></textarea>
+        </label>
+
+        <div class="vaccine-section">
+          <div class="vaccine-header">
+            <h4>Vacunas</h4>
+            <button class="button button-primary" type="button" id="add-vaccine-button">Agregar vacuna</button>
+          </div>
+          <div id="vaccine-list" class="vaccine-list"></div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="button button-secondary" type="button" id="cancel-clinic">Cancelar</button>
+        <button class="button button-primary" type="button" id="save-clinic">Guardar</button>
+      </div>
+      <p class="clinic-message" id="clinic-message" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
